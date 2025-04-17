@@ -8,31 +8,43 @@ const Register = () => {
     const [role, setRole] = useState('USER');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
+    try {
+        const response = await fetch('http://localhost:8080/calc/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, role }),
+        });
 
+        const responseData = await response.text(); // First get as text
+        
         try {
-            const response = await fetch('http://localhost:8080/calc/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, role }),
-            });
-
+            const jsonData = JSON.parse(responseData);
+            
             if (response.ok) {
                 alert('Registration successful!');
                 navigate('/login');
             } else {
-                const errorMessage = await response.json();
-                setError(`Registration failed: ${errorMessage.error}`);
+                // Handle JSON error response
+                setError(jsonData.message || jsonData.error || jsonData || 'Registration failed');
             }
-        } catch (err) {
-            console.error('Error:', err);
-            setError('Error connecting to the server.');
+        } catch {
+            // If not JSON, use the raw text
+            if (response.ok) {
+                alert('Registration successful!');
+                navigate('/login');
+            } else {
+                setError(responseData || response.statusText || 'Registration failed');
+            }
         }
-    };
-
+    } catch (err) {
+        console.error('Error:', err);
+        setError('Error connecting to the server.');
+    }
+};
     return (
         <div className="auth-container">
             <form className="auth-form" onSubmit={handleSubmit}>
