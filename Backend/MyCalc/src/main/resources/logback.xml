@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Define the appender for console output -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Define the appender for file output -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>C:/Users/sande/Downloads/Calculator/Calculator/log/app.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Daily rollover -->
+            <fileNamePattern>C:/Users/sande/Downloads/Calculator/Calculator/log/app.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- Keep 30 days' worth of history -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Set the root logging level to INFO -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        
+        <appender-ref ref="FILE" />
+    </root>
+
+    <!-- Set the logging level for specific packages -->
+    <logger name="org.springframework" level="INFO" />
+    <logger name="com.calculator.MyCalc" level="INFO" />
+    <logger name="org.springframework.security" level="DEBUG" />
+    <logger name="com.example.Spring_Sec.CustomUsernamePasswordAuthenticationFilter" level="DEBUG"/>
+    <logger name="org.springframework.orm.jpa" level="INFO" />
+    <logger name="org.springframework.transaction" level="INFO" />
+    <logger name="org.hibernate" level="DEBUG" />
+    <logger name="org.hibernate.SQL" level="DEBUG" />
+   <logger name= "org.springframework.boot.autoconfigure" level="INFO" />
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
+   <logger name="org.springframework.web" level="DEBUG"></logger>
+</configuration>
