@@ -47,7 +47,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers("/calc/register", "/calc/login").permitAll()
                     .requestMatchers("/calc/history").hasAuthority("ROLE_ADMIN")
-                    .requestMatchers("/calc/**").authenticated();
+                    .requestMatchers("/calc/**").hasAnyRole("USER","ADMIN");
             })
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // JWT requires stateless session
