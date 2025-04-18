@@ -1,5 +1,6 @@
 package com.calculator.MyCalc;
 import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,6 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import com.calculator.MyCalc.RegisterDTO;
+import com.calculator.MyCalc.LoginDTO;
 
 @RestController
 @RequestMapping("/calc")
@@ -56,6 +59,8 @@ public class Controller {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    
+    
 
     private ResponseEntity<CalculatorEntity> performOperation(String operationtype, double value1, double value2, String methodType) throws Exception
     {
@@ -103,13 +108,17 @@ public class Controller {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser ( @Valid @RequestBody User_Data user,BindingResult result) {
+    public ResponseEntity<?> registerUser ( @Valid @RequestBody RegisterDTO registerDto,BindingResult result) {
         
     	if(result.hasErrors()) {
     		String errorMessage=result.getFieldErrors().get(0).getDefaultMessage();
     		return ResponseEntity.badRequest().body(Map.of("error",errorMessage));
     	}
     			try {
+    				  User_Data user = new User_Data();
+    		            user.setUsername(registerDto.getUsername());
+    		            user.setPassword(registerDto.getPassword()); // Will be hashed in service
+    		            user.setRole(registerDto.getRole());
             userService.registerUser(user);
             return ResponseEntity.ok("User registered successfully!");
         } catch (RuntimeException e) {
@@ -120,7 +129,7 @@ public class Controller {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> loginUser( @Valid @RequestBody User_Data user,BindingResult result) {
+    public ResponseEntity<Map<String, String>> loginUser( @Valid @RequestBody LoginDTO loginDto,BindingResult result) {
         logger.info("Request received at /calc/login");
 
          if(result !=null && result.hasErrors())
@@ -132,7 +141,7 @@ public class Controller {
         try {
             // Authenticate the user
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
+                    new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword())
             );
 
             // Generate JWT token
@@ -143,7 +152,9 @@ public class Controller {
             String role = authentication.getAuthorities().stream()
                     .findFirst()
                     .map(GrantedAuthority::getAuthority)
-                    .orElse("USER");
+                    .orElseThrow(() -> new IllegalStateException("User has no roles assigned"));
+                    
+                    
 
             Map<String, String> response = new HashMap<>();
             response.put("message", "Login successful!");
@@ -151,7 +162,7 @@ public class Controller {
             response.put("token", jwt); // Include JWT in the response
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            logger.error("Login failed for username: {}", user.getUsername(), e);
+            logger.error("Login failed for username: {}", loginDto.getUsername(), e);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Invalid username or password"));
         }

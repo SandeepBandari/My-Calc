@@ -1,36 +1,27 @@
 package com.calculator.MyCalc;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-@Entity
-public class User_Data {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(unique = true)
+public class RegisterDTO
+{
+    @NotBlank(message = "Username cannot be blank")
+    @Size(min = 8, message = "Username must be at least 8 characters")
+    @Pattern(
+        regexp = "^(?=[^A-Z]*[A-Z])(?=[^a-z]*[a-z])(?=\\D*\\d)(?=[^@$!%*?&#^]*[@$!%*?&#^])[A-Za-z\\d@$!%*?&#^]{8,}$",
+        message = "Username must contain: 1 uppercase, 1 lowercase, 1 digit, 1 special character"
+    )
     private String username;
     
-   
+    @NotBlank(message = "Password cannot be blank")
+    @Size(min=8, message = "Password length must be 8 Characters")
     private String password;
+    
+    @NotBlank(message = "Role cannot be blank")
     private String role;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+    // Getters and Setters
     public String getUsername() {
         return username;
     }
